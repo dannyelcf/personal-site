@@ -1,0 +1,35 @@
+---
+interface Props {
+  id: string;
+  title?: string;
+}
+
+const { id, title = 'YouTube video' } = Astro.props;
+
+// Extract video ID from full YouTube URL or use as-is
+const getVideoId = (url: string) => {
+  // Match various YouTube URL formats
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([^&?]+)/,
+    /(?:youtu\.be\/)([^&?]+)/,
+    /(?:youtube\.com\/embed\/)([^&?]+)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+
+  return url; // Return as-is if no pattern matches
+};
+
+const videoId = getVideoId(id);
+---
+
+<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
+  <iframe
+    src={`https://www.youtube.com/embed/${videoId}`}
+    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0"
+    allowfullscreen=""
+    title={title}></iframe>
+</div>

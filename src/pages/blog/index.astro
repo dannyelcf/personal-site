@@ -1,0 +1,26 @@
+---
+import BlogListLayout from '@/layouts/BlogListLayout.astro';
+import { getCollection } from 'astro:content';
+import { calculateReadingTime } from '@/utils/readingTime';
+
+const allBlogPosts = await getCollection('blog', ({ data }) => {
+  return data.draft !== true;
+});
+
+const sortedPosts = await Promise.all(
+  allBlogPosts
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+    .map(async (post) => {
+      const { body } = post;
+      const readingTime = calculateReadingTime(body);
+      return { ...post, readingTime };
+    })
+);
+---
+
+<BlogListLayout
+  title="Posts 👨‍💻 - Dannyel Cardoso da Fonseca"
+  description="Dannyel's blog posts."
+  heading="Posts 👨‍💻"
+  posts={sortedPosts}
+/>

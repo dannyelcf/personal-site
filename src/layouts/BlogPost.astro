@@ -1,0 +1,109 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import TableOfContents from '@/components/organisms/TableOfContents.astro';
+import ProgressiveImage from '@/components/molecules/ProgressiveImage.astro';
+import Tag from '@/components/atoms/Tag.astro';
+import type { CollectionEntry } from 'astro:content';
+import { slugify } from '@/utils/slugify';
+import { calculateReadingTime } from '@/utils/readingTime';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { data, body } = post;
+
+// Get headings for TOC
+const { headings } = await post.render();
+
+// Calculate reading time
+const readingTime = calculateReadingTime(body);
+
+// Get the cover image (properly validated by Astro)
+const coverImage = data.cover;
+---
+
+<BaseLayout
+  title={`${data.title} - Dannyel Cardoso da Fonseca`}
+  description={data.description}
+  bodyClass="blog single"
+>
+  <main>
+    <article>
+      <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-10">
+          <div class="blog-header">
+            <h1>{data.title}</h1>
+            <p>
+              <small>
+                Posted in
+                {
+                  data.categories && data.categories.length > 0 && (
+                    <a
+                      class="stretched-link position-relative link-muted"
+                      href={`/categories/${slugify(data.categories[0])}/`}
+                    >
+                      {data.categories[0]}
+                    </a>
+                  )
+                }
+                on
+                {
+                  data.date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                }{' '}
+                by{' '}
+                <a
+                  class="stretched-link position-relative"
+                  href={data.contributors && data.contributors.length > 0
+                    ? `/contributors/${slugify(data.contributors[0])}/`
+                    : '#'}
+                >
+                  Dannyel Cardoso da Fonseca
+                </a> ‐ <strong>{readingTime} min read</strong>
+              </small>
+            </p>
+          </div>
+        </div>
+
+        {
+          coverImage && (
+            <div class="col-md-13">
+              <div>
+                <figure class="figure">
+                  <ProgressiveImage
+                    src={coverImage}
+                    alt={data.title}
+                    class="figure-img img-fluid"
+                    width={1270}
+                    height={740}
+                  />
+                </figure>
+              </div>
+            </div>
+          )
+        }
+
+        <div class="col-md-12 col-lg-9 text-content">
+          {data.toc && <TableOfContents headings={headings} />}
+
+          <slot />
+
+          {
+            data.tags && data.tags.length > 0 && (
+              <div class="mt-4">
+                {data.tags.map((tag) => (
+                  <Tag tag={tag} />
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </article>
+  </main>
+</BaseLayout>

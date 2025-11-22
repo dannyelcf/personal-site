@@ -1,0 +1,17 @@
+---
+interface Props {
+  isBlogPage: boolean;
+  mobile?: boolean;
+}
+
+const { isBlogPage, mobile = false } = Astro.props;
+const navClass = mobile
+  ? 'nav flex-lg-row align-items-lg-center mt-lg-0 ms-lg-2 me-lg-auto d-lg-none flex-row'
+  : 'nav flex-column flex-lg-row align-items-lg-center mt-lg-0 ms-lg-2 me-lg-auto mt-2';
+---
+
+<ul class={navClass}>
+  <li class="nav-item">
+    <a class={`nav-link py-1 ps-0${isBlogPage ? ' active' : ''}`} href="/blog">Blog</a>
+  </li>
+</ul>
