@@ -1,0 +1,30 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogPostCard from '@/components/organisms/BlogPostCard.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  posts: (CollectionEntry<'blog'> & { readingTime: number })[];
+}
+
+const { title, description, heading, posts } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} bodyClass="blog list">
+  <div class="row justify-content-center">
+    <div class="col-md-12 col-lg-9">
+      <h1 class="text-center">{heading}</h1>
+    </div>
+  </div>
+
+  <div class="row row-cols-1 row-cols-lg-2 g-lg-5">
+    {posts.map((post) => <BlogPostCard post={post} />)}
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-12 col-lg-9"></div>
+  </div>
+</BaseLayout>

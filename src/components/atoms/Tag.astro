@@ -1,0 +1,13 @@
+---
+import { slugify } from '@/utils/slugify';
+
+interface Props {
+  tag: string;
+}
+
+const { tag } = Astro.props;
+---
+
+<a class="btn btn-light me-2 mb-1" href={`/tags/${slugify(tag)}/`} role="button">
+  {tag}
+</a>

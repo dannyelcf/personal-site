@@ -1,0 +1,40 @@
+---
+interface Props {
+  icon?: string;
+  text?: string;
+}
+
+const { icon, text } = Astro.props;
+---
+
+<div class="alert alert-doks d-flex" role="alert">
+  {icon && <div class="alert-icon flex-shrink-1">{icon}</div>}
+  {
+    text ? (
+      <div set:html={text} />
+    ) : (
+      <div>
+        <slot />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .alert-icon {
+    margin-right: 0.75rem;
+  }
+  .alert-doks {
+    background: #fbf7f0;
+    color: #1d2d35;
+    font-family:
+      sfmono-regular, menlo, monaco, consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 0.9625rem;
+    line-height: 28px;
+  }
+
+  [data-dark-mode] .alert-doks {
+    background: #1b1f22;
+    color: #dee2e6;
+  }
+</style>

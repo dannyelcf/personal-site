@@ -1,0 +1,25 @@
+pre-commit:
+  parallel: false
+  commands:
+    prettier:
+      glob: '*.{js,ts,astro,json,md,css}'
+      run: npx prettier --write --list-different {staged_files}
+      stage_fixed: true
+      skip:
+        - merge
+        - rebase
+    eslint:
+      glob: '*.{js,ts,astro}'
+      run: npx eslint --fix --no-warn-ignored {staged_files}
+      stage_fixed: true
+      skip:
+        - merge
+        - rebase
+
+pre-push:
+  parallel: false
+  commands:
+    lint:
+      run: npm run lint
+    format-check:
+      run: npm run format:check

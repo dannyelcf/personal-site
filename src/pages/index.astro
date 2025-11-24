@@ -1,16 +1,80 @@
 ---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlogPostCard from '@/components/organisms/BlogPostCard.astro';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { calculateReadingTime } from '@/utils/readingTime';
+import meImage from '@/assets/images/me.png';
 
+const allBlogPosts = await getCollection('blog', ({ data }) => {
+  return data.draft !== true;
+});
+
+const featuredPosts = await Promise.all(
+  allBlogPosts
+    .filter((post) => post.data.homepage === true)
+    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+    .slice(0, 2)
+    .map(async (post) => {
+      const { body } = post;
+      const readingTime = calculateReadingTime(body);
+      return { ...post, readingTime };
+    })
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout
+  title="Hello Dev 👋"
+  description="Welcome! 🎉 I'm Dannyel, a geek 🤓 web developer! Here, I am excited to share my knowledge, experiences, and insights gained throughout my career in the development industry."
+>
+  <section class="section container-fluid mt-n3 px-0 pb-3">
+    <div class="row justify-content-center align-items-center">
+      <!-- Image Left (5 cols on lg) -->
+      <div class="col-lg-5 mb-lg-0 pe-lg-0 mb-5 text-center">
+        <Image
+          src={meImage}
+          alt="Dannyel - Web Developer"
+          format="webp"
+          quality={80}
+          style="border-radius:.5rem;width:100%;height:auto"
+        />
+      </div>
+      <!-- Content Right (7 cols on lg) -->
+      <div class="col-lg-7 text-content text-center">
+        <h1 class="mt-0">Hello Dev 👋</h1>
+        <p class="lead">
+          I'm Dannyel, a geek 🤓 web developer!
+          <span style="display:block;font-size:1rem;color:gray"
+            >...and not a UX designer as you can tell... 🤭</span
+          >
+        </p>
+      </div>
+    </div>
+
+    <div class="row justify-content-center mt-lg-5 mt-3">
+      <div class="col-lg-12 text-content">
+        <article>
+          <p>
+            Here, I am excited to share my knowledge, experiences, and insights gained throughout my
+            career in the development industry. From the challenges I've faced to the solutions I've
+            discovered, I aim to provide valuable content that can inspire and assist you, my fellow
+            developer!
+          </p>
+        </article>
+
+        {
+          featuredPosts.length > 0 && (
+            <>
+              <h2 class="featured-posts">Featured posts 🚀</h2>
+              <div class="row row-cols g-lg-5">
+                {featuredPosts.map((post) => (
+                  <BlogPostCard post={post} />
+                ))}
+              </div>
+            </>
+          )
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>

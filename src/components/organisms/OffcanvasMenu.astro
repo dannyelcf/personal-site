@@ -1,0 +1,36 @@
+---
+import BrandLink from '@/components/molecules/BrandLink.astro';
+import Navigation from '@/components/organisms/Navigation.astro';
+import SocialLinks from '@/components/organisms/SocialLinks.astro';
+
+interface Props {
+  isBlogPage: boolean;
+}
+
+const { isBlogPage } = Astro.props;
+---
+
+<div
+  class="offcanvas offcanvas-end py-lg-1 border-0"
+  tabindex="-1"
+  id="offcanvasDoks"
+  data-bs-backdrop="true"
+  aria-labelledby="offcanvasDoksLabel"
+>
+  <div class="header-bar d-lg-none"></div>
+  <div class="offcanvas-header d-lg-none">
+    <h2 class="h5 offcanvas-title ps-2" id="offcanvasDoksLabel">
+      <BrandLink />
+    </h2>
+    <button
+      type="button"
+      class="btn-close text-reset me-2"
+      data-bs-dismiss="offcanvas"
+      aria-label="Close main menu"></button>
+  </div>
+  <div class="offcanvas-body p-lg-0 p-4">
+    <Navigation isBlogPage={isBlogPage} mobile={false} />
+    <hr class="text-black-50 d-lg-none my-4" />
+    <SocialLinks />
+  </div>
+</div>

@@ -1,0 +1,17 @@
+---
+import BlogListLayout from '@/layouts/BlogListLayout.astro';
+import { getStaticPathsByField } from '@/utils/getStaticPathsHelper';
+
+export async function getStaticPaths() {
+  return getStaticPathsByField('categories', 'category');
+}
+
+const { heading, posts } = Astro.props;
+---
+
+<BlogListLayout
+  title={`${heading} - Dannyel Cardoso da Fonseca`}
+  description={`Blog posts in category: ${heading}`}
+  heading={heading}
+  posts={posts}
+/>
