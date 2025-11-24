@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import BlogPostCard from '@/components/organisms/BlogPostCard.astro';
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { calculateReadingTime } from '@/utils/readingTime';
+import meImage from '@/assets/images/me.png';
 
 const allBlogPosts = await getCollection('blog', ({ data }) => {
   return data.draft !== true;
@@ -29,7 +31,13 @@ const featuredPosts = await Promise.all(
     <div class="row justify-content-center align-items-center">
       <!-- Image Left (5 cols on lg) -->
       <div class="col-lg-5 mb-lg-0 pe-lg-0 mb-5 text-center">
-        <img src="/me.png" alt="" style="border-radius:.5rem" />
+        <Image
+          src={meImage}
+          alt="Dannyel - Web Developer"
+          format="webp"
+          quality={80}
+          style="border-radius:.5rem;width:100%;height:auto"
+        />
       </div>
       <!-- Content Right (7 cols on lg) -->
       <div class="col-lg-7 text-content text-center">
