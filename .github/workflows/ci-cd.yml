@@ -56,3 +56,59 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Cleanup old deployments
+        run: |
+          PROJECT_NAME="dannyelcf-dev"
+          CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
+
+          echo "Current branch: $CURRENT_BRANCH"
+          echo "Fetching deployments..."
+          DEPLOYMENTS=$(npx wrangler pages deployment list --project-name="$PROJECT_NAME" --json)
+
+          # Debug: Show total deployment count
+          TOTAL_COUNT=$(echo "$DEPLOYMENTS" | jq '. | length')
+          echo "Total deployments found: $TOTAL_COUNT"
+
+          if [ "$CURRENT_BRANCH" = "master" ]; then
+            # Clean up production deployments (master branch)
+            PRODUCTION_COUNT=$(echo "$DEPLOYMENTS" | jq '[.[] | select(.Environment == "Production")] | length')
+            echo "Production deployments: $PRODUCTION_COUNT"
+
+            PRODUCTION_IDS=$(echo "$DEPLOYMENTS" | jq -r '[.[] | select(.Environment == "Production")] | sort_by(.Status) | reverse | .[2:] | .[].Id')
+
+            if [ -n "$PRODUCTION_IDS" ]; then
+              for DEPLOYMENT_ID in $PRODUCTION_IDS; do
+                echo "Deleting old production deployment: $DEPLOYMENT_ID"
+                curl -X DELETE \
+                  "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PROJECT_NAME/deployments/$DEPLOYMENT_ID" \
+                  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -s || true
+              done
+            else
+              echo "No old production deployments to delete (keeping 2 most recent)"
+            fi
+          elif [ "$CURRENT_BRANCH" = "next" ]; then
+            # Clean up preview deployments for next branch
+            NEXT_COUNT=$(echo "$DEPLOYMENTS" | jq --arg branch "$CURRENT_BRANCH" '[.[] | select(.Environment == "Preview" and .Branch == $branch)] | length')
+            echo "Preview deployments for $CURRENT_BRANCH branch: $NEXT_COUNT"
+
+            NEXT_IDS=$(echo "$DEPLOYMENTS" | jq -r --arg branch "$CURRENT_BRANCH" '[.[] | select(.Environment == "Preview" and .Branch == $branch)] | sort_by(.Status) | reverse | .[1:] | .[].Id')
+
+            if [ -n "$NEXT_IDS" ]; then
+              for DEPLOYMENT_ID in $NEXT_IDS; do
+                echo "Deleting old preview deployment from $CURRENT_BRANCH: $DEPLOYMENT_ID"
+                curl -X DELETE \
+                  "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$PROJECT_NAME/deployments/$DEPLOYMENT_ID" \
+                  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+                  -H "Content-Type: application/json" \
+                  -s || true
+              done
+            else
+              echo "No old preview deployments to delete for $CURRENT_BRANCH (keeping 1 most recent)"
+            fi
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
