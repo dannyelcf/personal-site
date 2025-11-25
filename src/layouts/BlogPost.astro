@@ -3,6 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import TableOfContents from '@/components/organisms/TableOfContents.astro';
 import ProgressiveImage from '@/components/molecules/ProgressiveImage.astro';
 import Tag from '@/components/atoms/Tag.astro';
+import Disqus from '@/components/molecules/Disqus.astro';
 import type { CollectionEntry } from 'astro:content';
 import { slugify } from '@/utils/slugify';
 import { calculateReadingTime } from '@/utils/readingTime';
@@ -22,6 +23,10 @@ const readingTime = calculateReadingTime(body);
 
 // Get the cover image (properly validated by Astro)
 const coverImage = data.cover;
+
+// Build the canonical URL for Disqus
+const siteUrl = 'https://dannyelcf.dev';
+const postUrl = `${siteUrl}/blog/${post.slug}/`;
 ---
 
 <BaseLayout
@@ -99,6 +104,14 @@ const coverImage = data.cover;
                 {data.tags.map((tag) => (
                   <Tag tag={tag} />
                 ))}
+              </div>
+            )
+          }
+
+          {
+            data.disqus && (
+              <div class="mt-5">
+                <Disqus url={postUrl} identifier={post.slug} />
               </div>
             )
           }
