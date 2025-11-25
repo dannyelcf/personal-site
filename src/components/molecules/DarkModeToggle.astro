@@ -11,3 +11,18 @@ import SunIcon from '@/components/atoms/icons/SunIcon.astro';
     <SunIcon />
   </span>
 </button>
+
+<script is:inline>
+  (() => {
+    const modeButton = document.getElementById('mode');
+    if (!modeButton) return;
+
+    // Override the existing click handler to dispatch a custom event
+    modeButton.addEventListener('click', () => {
+      // Wait for the theme change to complete
+      setTimeout(() => {
+        window.dispatchEvent(new Event('themeChanged'));
+      }, 100);
+    });
+  })();
+</script>
