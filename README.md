@@ -15,11 +15,27 @@ My personal website built with Astro.js, Tailwind CSS, and deployed on Cloudflar
 - 🌙 **Dark Theme** - Beautiful dark UI
 - 🎯 **Type-Safe** - TypeScript + Content Collections
 
+## Environments
+
+This project uses two deployment environments on Cloudflare Pages:
+
+- **Preview** - [next.dannyelcf.dev](https://next.dannyelcf.dev)
+  - Branch: `next`
+  - Automatically deploys on push to `next` branch
+  - Used for testing changes before production
+
+- **Production** - [dannyelcf.dev](https://dannyelcf.dev)
+  - Branch: `master`
+  - Automatically deploys on push to `master` branch
+  - Live production site
+
+Pushes to either branch trigger automatic CI/CD deployment via GitHub Actions.
+
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ (check with `node -v`)
+- Node.js 22+ (check with `node -v`)
 - npm or your preferred package manager
 
 ### Development
@@ -55,6 +71,9 @@ npm run deploy
 
 ```
 /
+├── .github/
+│   └── workflows/   # CI/CD workflows
+│       └── deploy.yml
 ├── public/           # Static assets
 │   ├── me.png       # Profile image
 │   ├── favicon.svg
@@ -63,6 +82,7 @@ npm run deploy
 ├── src/
 │   ├── components/  # Reusable Astro components
 │   │   ├── Alert.astro
+│   │   ├── Disqus.astro
 │   │   └── YouTube.astro
 │   ├── content/     # Content collections
 │   │   ├── config.ts
@@ -78,7 +98,8 @@ npm run deploy
 │       └── global.css
 ├── astro.config.mjs
 ├── package.json
-└── tailwind.config.js
+├── tailwind.config.js
+└── lefthook.yml     # Git hooks configuration
 ```
 
 ## Content Management
@@ -97,26 +118,29 @@ npm run deploy
    ---
    title: 'My Awesome Post'
    description: 'A description of the post'
-   date: 2024-01-15
+   date: 2025-01-15
    categories: ['Tech']
    tags: ['astro', 'web-dev']
    homepage: true
    draft: false
    ---
 
-   import Alert from '../../../components/Alert.astro';
+   import Alert from '@/components/Alert.astro';
 
    Your content here...
 
    <Alert icon="💡" text="Use components in your posts!" />
    ```
 
-3. Add images to the same directory
-4. Build and deploy!
+3. Add images to the same directory (optional)
+4. Commit and push to the `next` branch
+5. The CI/CD pipeline will automatically build and deploy your changes!
 
 ### Available Components
 
 #### Alert
+
+Display highlighted notes or warnings in your blog posts.
 
 ```mdx
 <Alert icon="💡" text="Your message here" />
@@ -126,30 +150,51 @@ npm run deploy
 
 #### YouTube
 
+Embed YouTube videos with responsive design.
+
 ```mdx
 <YouTube id="VIDEO_ID" title="Video Title" />
 <YouTube id="https://youtube.com/watch?v=VIDEO_ID" />
 ```
 
+#### Disqus
+
+Add comment sections to your blog posts.
+
+```mdx
+import Disqus from '@/components/Disqus.astro';
+
+<Disqus />
+```
+
 ## Deployment
 
-### Option 1: Git Integration (Recommended)
+### Automatic CI/CD (Recommended)
 
-1. Push code to GitHub
-2. Go to [Cloudflare Pages](https://pages.cloudflare.com/)
-3. Connect repository
-4. Configure:
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-5. Deploy!
+The site is automatically deployed via GitHub Actions when you push to the `next` branch.
 
-### Option 2: Wrangler CLI
+**Workflow:**
+
+1. Make your changes locally
+2. Commit your changes: `git commit -m "Your message"`
+3. Push to the `next` branch: `git push origin next`
+4. GitHub Actions automatically:
+   - Runs linting and formatting checks
+   - Builds the site
+   - Deploys to Cloudflare Pages
+   - Cleans up old deployments (keeps last 3)
+
+The workflow file is located at `.github/workflows/deploy.yml`.
+
+### Manual Deployment (Alternative)
+
+If you need to deploy manually using Wrangler CLI:
 
 ```bash
 # Login to Cloudflare
-wrangler login
+npx wrangler login
 
-# Deploy
+# Build and deploy
 npm run deploy
 ```
 
