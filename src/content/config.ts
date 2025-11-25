@@ -18,7 +18,7 @@ const blog = defineCollection({
       pinned: z.boolean().default(false),
       homepage: z.boolean().default(false),
       toc: z.boolean().default(true),
-      giscus: z.number().optional(),
+      disqus: z.boolean().default(false),
     }),
 });
 
