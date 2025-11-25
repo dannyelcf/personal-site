@@ -21,6 +21,19 @@ const { url, identifier } = Astro.props;
     s.setAttribute('data-timestamp', +new Date());
     (d.head || d.body).appendChild(s);
   })();
+
+  // Listen for theme changes and reload Disqus
+  window.addEventListener('themeChanged', function () {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: function () {
+          this.page.url = pageUrl;
+          this.page.identifier = pageIdentifier;
+        },
+      });
+    }
+  });
 </script>
 
 <noscript
